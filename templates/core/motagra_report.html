@@ -1,0 +1,63 @@
+<html>
+<head>
+    <title>PDF page</title>
+    <style>
+
+
+        #tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; }
+
+          table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+          }
+
+          th,
+          td {
+            padding: 10px;
+            border: 1px solid black;
+            text-align: center;
+          }
+
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="tab">
+        <table dir='rtl'>
+            <tr dir='rtl'>
+                <th>اسم الصنف</th>
+                <th>الكمية</th>
+                <th>عدد القطع</th>
+                <th>اجمالي القطع</th>
+                <th>سعر الشراء</th>
+                <th>سعر القطعة</th>
+                <th>سعر البيع</th>
+                <th>الربح</th>
+            </tr>
+            {%for motagra_details in motagrat_details%}
+            <tr>
+                <td>{{motagra_details.product.name}}</td>
+                <td>{{motagra_details.qty}}</td>
+                <td>{{motagra_details.pieces}}</td>
+                <td>{{motagra_details.pieces}} * {{motagra_details.qty}}</td>
+                <td>{{motagra_details.piece_price}}</td>
+                <td>{{motagra_details.buy_price}}</td>
+                <td>{{motagra_details.sell_price}}</td>
+                <td>{{motagra_details.profit}}</td>
+            </tr>
+            {% endfor %}
+            <tr>{{ total_buy_price}}</tr>
+            <tr>{{ total_sell_price}}</tr>
+            <tr>{{ total_profit}}</tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

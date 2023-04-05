@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+
+<form method="POST" action="">
+    {% csrf_token %}
+    <select id = "options" name="selected_option">
+        {% for motagra in motagrat %}
+        <option value="{{motagra.id}}"> {{motagra.date}} {{ motagra.name }} </option>
+        {% endfor %}
+    </select>
+    		<br><br>
+		<input type="submit" value="طباعة">
+</form>
+
+</body>
+</html>
