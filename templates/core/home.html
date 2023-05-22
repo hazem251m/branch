@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
 </head>
 <body>
 
-<form method="POST" action="">
+<form class = "m-3" method="POST" action="">
     {% csrf_token %}
     <select id = "options" name="selected_option">
         {% for motagra in motagrat %}
@@ -14,7 +17,7 @@
         {% endfor %}
     </select>
     		<br><br>
-		<input type="submit" value="طباعة">
+		<input class = "btn btn-primary" type="submit" value="طباعة">
 </form>
 
 </body>

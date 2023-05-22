@@ -61,10 +61,11 @@ class ProductDetailApiView(APIView):
 class ControlPeriodListView(APIView):
     def check_last_period(self, request):
         last_period = Control_Period.objects.last()
-        last_period.active = False
-        last_period.close_date = datetime.today()
-        last_period.save()
-        return last_period
+        if last_period:
+            last_period.active = False
+            last_period.close_date = datetime.today()
+            last_period.save()
+            return last_period
 
     # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, *args, **kwargs):
@@ -84,12 +85,15 @@ class ControlPeriodListView(APIView):
             if periods is not None:  # TODO REPAIR
                 self.check_last_period(request)
             serializer.save()
-            print(type(serializer.data['start_date']))
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MotagratListView(APIView):
+    def check_last_motagra(self, request):
+        last_motagra = Motagrat.objects.last()
+        return last_motagra
     def check_available_period(self, request):
         last_period = Control_Period.objects.last()
         if last_period.active and last_period.close_date is None:
@@ -114,6 +118,7 @@ class MotagratListView(APIView):
         }
         serializer = MotagratSerializer(data=data)
         if serializer.is_valid():
+            print(self.check_last_motagra(request))
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -134,28 +139,28 @@ class MotagratProductsListView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         product = Products.objects.get(name=request.data.get('product'))
-
         if not product:
             return Response(
                 {"message": "product doesn't exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         buy_price = float(request.data.get('buy_price'))
-        sell_price = float(request.data.get('sell_price'))
+        qty = int(request.data.get('qty'))
+        pieces = request.data.get('pieces')
+        piece_price = request.data.get('piece_price')
         data = {
-            'qty': int(request.data.get('qty')),
-            "pieces": request.data.get('pieces'),
-            "piece_price": request.data.get('piece_price'),
+            'qty': qty,
+            "pieces": pieces,
+            "piece_price": piece_price,
             "buy_price": buy_price,
-            "sell_price": sell_price,
-            "profit": sell_price - buy_price,
+            "profit": (int(pieces) * qty * int(piece_price)) - buy_price,
             "product": product.id,
             'motagra': active_motagra.id
         }
         serializer = MotagratProductsSerializer(data=data)
         if serializer.is_valid():
             product.stock += int(request.data.get('qty'))
-            product.sell_price = sell_price
+            product.sell_price = piece_price
             product.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -175,14 +180,14 @@ class MotagraDetailApiView(APIView):
         total_buy_price = 0
         total_profit = 0
         for motagra in motagrat:
-            total_sell_price += motagra.sell_price
+            total_sell_price += motagra.total_sell_price_value
             total_buy_price += motagra.buy_price
             total_profit += motagra.profit
         motagrat = self.get_objects(motagra_id=motagra_id)
         if not motagrat:
             return Response(
                 {"message": "motagra doesn't exists"},
-                status=status.HTTP_400_BAD_REQUEST, )
+                status=status.HTTP_400_BAD_REQUEST,)
         serializer = MotagraProductsDetailSerializer(motagrat, many=True)
         data = serializer.data
         response = {'data': data, 'total_buy_price': total_buy_price, 'total_sell_price': total_sell_price,

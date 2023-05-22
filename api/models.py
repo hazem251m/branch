@@ -47,7 +47,6 @@ class Motagrat_Products(models.Model):
     pieces = models.PositiveIntegerField()
     piece_price = models.FloatField()
     buy_price = models.FloatField()
-    sell_price = models.FloatField()
     profit = models.FloatField()
 
     def __str__(self):
@@ -65,12 +64,14 @@ class Motagrat_Products(models.Model):
         return Motagrat_Products.objects.aggregate(Sum('buy_price'))
 
     @property
-    def total_sell_price_value(self):
-        return Motagrat_Products.objects.aggregate(Sum('sell_price'))
-
-    @property
     def total_profit_value(self):
         return Motagrat_Products.objects.aggregate(Sum('profit'))
+    @property
+    def total_pieces_for_product(self):
+        return self.qty * self.pieces
+    @property
+    def total_sell_price_value(self):
+        return self.pieces * self.qty * self.piece_price
 
 
 PAYMENTTYPES = ((1, 'كاش'),

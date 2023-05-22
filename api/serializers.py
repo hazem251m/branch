@@ -36,7 +36,7 @@ class MotagraProductsDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Motagrat_Products
-        fields = ["product_name", "qty", "pieces", "piece_price", "buy_price", "sell_price", "profit"]
+        fields = ["product_name", "qty", "pieces", "piece_price", "buy_price", "profit"]
 
 
 class AvailableProductsSerializer(serializers.Serializer):
